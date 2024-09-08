@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestão de Recursos Humanos - SEDUC AM</title>
+    
+    <!-- Fonte do Google -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <!-- Biblioteca jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <!-- Caminho relativo para o CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container fade-in">
+        <h1>Formatação de Dados do Sistema</h1>
+        <div class="form-group">
+            <label for="dadosSistema" class="required">Cole os dados do sistema aqui:</label>
+            <textarea id="dadosSistema" rows="10" style="width: 100%; margin-bottom: 10px;" aria-label="Dados do Sistema" required=""></textarea>
+            <button id="formatarDados" class="btn">Formatar Dados</button>
+        </div>
+        <div id="dadosFormatados" style="display:none;">
+            <h2>Dados Formatados</h2>
+            <table id="tabelaDados">
+                <thead>
+                    <tr>
+                        <th>Campo</th>
+                        <th>Valor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Os dados formatados serão inseridos aqui -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="container fade-in">
+        <h1>Cálculo de Exercício de Férias</h1>
+        <form id="feriaForm">
+            <div class="form-group">
+                <label for="dataAdmissao" class="required">Data de Admissão:</label>
+                <input type="date" id="dataAdmissao" name="dataAdmissao" required="" aria-label="Data de Admissão">
+            </div>
+            <button type="submit" class="btn" onclick="calcularPeriodosFerias(dataAdmissao)">Calcular Exercícios de Férias</button>
+        </form>
+        
+        <div id="resultados" style="display:none;">
+            <h2>Períodos de Exercício de Férias</h2>
+            <div id="alertas"></div>
+            <div class="spinner" id="loadingSpinner"></div>
+            <table id="tabelaFerias">
+                <thead>
+                    <tr>
+                        <th>Período</th>
+                        <th>Início</th>
+                        <th>Fim</th>
+                        <th>Ano Referência do Exercício</th>
+                        <th>Selecionar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Os resultados serão inseridos aqui -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="container fade-in">
+        <h1>Gerador de Memorando de Férias</h1>
+        <form id="memorandoForm">
+            <fieldset>
+                <legend>Informações do Servidor</legend>
+                <div class="form-group">
+                    <label for="numero" class="required tooltip">
+                        Número do Memorando:
+                        <span class="tooltiptext">Formato: MM/AAAA</span>
+                    </label>
+                    <input type="text" id="numero" name="numero" required="" aria-label="Número do Memorando" placeholder="Ex: 05/2023">
+                </div>
+                <div class="form-group">
+                    <label for="nome" class="required">Nome do Servidor:</label>
+                    <input type="text" id="nome" name="nome" required="" aria-label="Nome do Servidor">
+                </div>
+                <div class="form-group">
+                    <label for="cargo" class="required">Cargo:</label>
+                    <input type="text" id="cargo" name="cargo" required="" aria-label="Cargo">
+                </div>
+                <div class="form-group">
+                    <label for="matricula" class="required">Matrícula:</label>
+                    <input type="text" id="matricula" name="matricula" required="" aria-label="Matrícula">
+                </div>
+                <div class="form-group">
+                    <label for="lotacao" class="required">Lotação:</label>
+                    <input type="text" id="lotacao" name="lotacao" required="" aria-label="Lotação">
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>Período de Férias</legend>
+                <div class="form-group">
+                    <label for="exercicioInicio" class="required">Início do Exercício:</label>
+                    <input type="date" id="exercicioInicio" name="exercicioInicio" required="" aria-label="Início do Exercício">
+                </div>
+                <div class="form-group">
+                    <label for="exercicioFim" class="required">Fim do Exercício:</label>
+                    <input type="date" id="exercicioFim" name="exercicioFim" required="" aria-label="Fim do Exercício">
+                </div>
+                <div class="form-group">
+                    <label for="diasSolicitados" class="required">Dias de Férias Solicitados:</label>
+                    <input type="number" id="diasSolicitados" name="diasSolicitados" required="" aria-label="Dias de Férias Solicitados" min="1" max="30">
+                </div>
+                <div class="form-group">
+                    <label for="feriasInicio" class="required">Início das Férias:</label>
+                    <input type="date" id="feriasInicio" name="feriasInicio" required="" aria-label="Início das Férias">
+                </div>
+                <div class="form-group">
+                    <label for="feriasFim">Fim das Férias:</label>
+                    <input type="date" id="feriasFim" name="feriasFim" readonly="" aria-label="Fim das Férias">
+                </div>
+                <div class="form-group">
+                    <label for="dataRetorno">Data de Retorno ao Trabalho:</label>
+                    <input type="date" id="dataRetorno" name="dataRetorno" readonly="" aria-label="Data de Retorno ao Trabalho">
+                </div>
+            </fieldset>
+            <div class="form-group">
+                <label for="observacoes">Observações:</label>
+                <textarea id="observacoes" name="observacoes" rows="4" aria-label="Observações"></textarea>
+            </div>
+            <button type="submit" class="btn">Gerar Memorando</button>
+            <button type="button" id="limparFormulario" class="btn" style="margin-left: 10px;">Limpar Formulário</button>
+        </form>
+        
+        <div id="memorando" style="display:none;">
+            <p>Memorando gerado com sucesso!</p>
+        </div>
+        <button id="gerarPdf" class="btn">Gerar PDF do Memorando</button>
+    </div>
+
+    <!-- Caminho relativo para o JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
