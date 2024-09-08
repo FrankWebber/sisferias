@@ -1,3 +1,14 @@
+function recarregarPagina() {
+            location.reload();
+        }
+
+
+
+
+
+
+
+
 function extrairInfo(texto, chave, ateCaracter = '') {
         const regex = new RegExp(chave + "\\s*:?\\s*(.*?)(?=" + ateCaracter + "|$)", "i");
         const match = texto.match(regex);
