@@ -1,280 +1,252 @@
-function recarregarPagina() {
-            location.reload();
-        }
-
-function extrairInfo(texto, chave, ateCaracter = '') {
-    // Adaptando o padrão de busca para espaços e múltiplas ocorrências
-    const regex = new RegExp(chave + "\\s*:?\\s*(.*?)(?=" + (ateCaracter ? ateCaracter : "\\s{2,}|$") + ")", "i");
-    const match = texto.match(regex);
-    return match ? match[1].trim() : '';
+function isLeapYear(year) {
+    return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
 }
 
-    function calcularPeriodosFerias(dataAdmissao) {
-        const hoje = new Date();
-        let periodos = [];
-        let dataInicio = new Date(dataAdmissao);
-        let periodo = 1;
+function convertToTable() {
+    const input = document.getElementById('inputText').value;
+    
+    const regex = {
+        lotacao: /Lotacao:\s*([0-9.]+)\s*-\s*(.+?)\s*Ingresso:/,
+        ingresso: /Ingresso:\s*(\w+)/,
+        servidor: /Servidor:\s*(\d+\.\d+-\d+)\s*\w*\s*-\s*(.+?)\s*Status:/,
+        status: /Status:\s*(\w+)/,
+        horasTrabalhadas: /(\d{2}:\d{2})\s+(\d{2}:\d{2})\s+(\d{2}:\d{2})/,
+        posse: /Posse\.+:\s*(\d{2}\/\d{2}\/\d{4})/,
+        dtInicio: /Dt Inicio\.:\s*(\d{2}\/\d{2}\/\d{4})/,
+        dtTermino: /Dt Termino\.:\s*(\d{2}\/\d{2}\/\d{4})?/,
+        cargo: /Cargo\.+:\s*(.+?)\s*Posse/
+    };
 
-        while (dataInicio <= hoje) {
-            let dataFim = new Date(dataInicio);
-            dataFim.setFullYear(dataFim.getFullYear() + 1);
-            dataFim.setDate(dataFim.getDate() - 1);
+    const lotacaoMatch = input.match(regex.lotacao);
+    const lotacao = lotacaoMatch ? `${lotacaoMatch[1]} - ${lotacaoMatch[2].trim()}` : '';
+    const ingresso = input.match(regex.ingresso) ? input.match(regex.ingresso)[1] : '';
+    
+    const servidorMatch = input.match(regex.servidor);
+    const matricula = servidorMatch ? servidorMatch[1] : '';
+    const servidorNome = servidorMatch ? servidorMatch[2].trim() : '';
+    
+    const status = input.match(regex.status) ? input.match(regex.status)[1] : '';
+    
+    const horasMatch = input.match(regex.horasTrabalhadas);
+    const horasTrabalhadas = horasMatch ? horasMatch[1] : '';
+    const turno1 = horasMatch ? horasMatch[2] : '';
+    const turno2 = horasMatch ? horasMatch[3] : '';
+    
+    const dtInicio = input.match(regex.dtInicio) ? input.match(regex.dtInicio)[1] : '';
+    const dtTermino = input.match(regex.dtTermino) ? input.match(regex.dtTermino)[1] : 'Não especificado';
+    
+    const cargo = input.match(regex.cargo) ? input.match(regex.cargo)[1].trim() : '';
+    const posse = input.match(regex.posse) ? input.match(regex.posse)[1] : '';
 
-            periodos.push({
-                periodo: periodo,
-                inicio: new Date(dataInicio),
-                fim: new Date(dataFim),
-                anoReferencia: dataInicio.getFullYear(),
-            });
+    const table = `
+      <table>
+        <tr><th>Campo</th><th>Valor</th></tr>
+        <tr><td>Lotação</td><td>${lotacao}</td></tr>
+        <tr><td>Ingresso</td><td>${ingresso}</td></tr>
+        <tr><td>Servidor</td><td>${servidorNome}</td></tr>
+        <tr><td>Matrícula</td><td>${matricula}</td></tr>
+        <tr><td>Status</td><td>${status}</td></tr>
+        <tr><td>Horas Trabalhadas</td><td>${horasTrabalhadas}</td></tr>
+        <tr><td>1º Turno</td><td>${turno1}</td></tr>
+        <tr><td>2º Turno</td><td>${turno2}</td></tr>
+        <tr><td>Data de Início</td><td>${dtInicio}</td></tr>
+        <tr><td>Data de Término</td><td>${dtTermino}</td></tr>
+        <tr><td>Cargo</td><td>${cargo}</td></tr>
+        <tr><td>Posse</td><td>${posse}</td></tr>
+      </table>
+    `;
 
-            dataInicio = new Date(dataFim);
-            dataInicio.setDate(dataInicio.getDate() + 1);
-            periodo++;
-        }
+    document.getElementById('output').innerHTML = table;
 
-        return periodos;
-    }
+    if (posse) {
+        const [day, month, year] = posse.split('/').map(Number);
+        const posseDate = new Date(year, month - 1, day);
+        const exercicios = calculateExercicios(posseDate);
 
-    function formatarDados() {
-        const dadosSistema = document.getElementById('dadosSistema').value;
-        const tabelaDados = document.getElementById('tabelaDados').getElementsByTagName('tbody')[0];
-        tabelaDados.innerHTML = '';
+        let feriasTable = `
+            <table>
+                <tr>
+                    <th>Exercício</th>
+                    <th>Início</th>
+                    <th>Até</th>
+                    <th>Término</th>
+                </tr>
+        `;
 
-        const campos = [
-            { nome: 'Servidor', chave: 'Servidor:', ate: 'ILS' },
-            { nome: 'Matrícula', chave: 'Mat:', ate: 'Sit:' },
-            { nome: 'Nome da Mãe', chave: 'Nome Mãe:', ate: 'Ano Adm' },
-            { nome: 'Ano de Admissão', chave: 'Ano Adm:', ate: 'Nascto' },
-            { nome: 'Data de Nascimento', chave: 'Nascto:', ate: 'Situação' },
-            { nome: 'Situação', chave: 'Situação:', ate: 'Homol' },
-            { nome: 'CPF', chave: 'C\\.P\\.F\\.:', ate: 'Local Apres' },
-            { nome: 'Local de Apresentação', chave: 'Local Apres:', ate: 'Data Apres' },
-            { nome: 'Data de Apresentação', chave: 'Data Apres:', ate: 'Tipo Função' },
-            { nome: 'Tipo de Função', chave: 'Tipo Função:', ate: 'Vínculo' },
-            { nome: 'Vínculo', chave: 'Vínculo:', ate: 'Tipo Objeto' },
-            { nome: 'Cargo', chave: 'Crg:', ate: '$' }
-        ];
-
-        campos.forEach(campo => {
-            const valor = extrairInfo(dadosSistema, campo.chave, campo.ate);
-            if (valor) {
-                const row = tabelaDados.insertRow();
-                row.insertCell(0).textContent = campo.nome;
-                row.insertCell(1).textContent = valor;
-            }
+        exercicios.forEach((ex, index) => {
+            feriasTable += `
+                <tr>
+                    <td>${year + index}</td>
+                    <td>${ex.inicio}</td>
+                    <td>a</td>
+                    <td>${ex.termino}</td>
+                </tr>
+            `;
         });
 
-        document.getElementById('dadosFormatados').style.display = 'block';
-        preencherFormulario(dadosSistema);
+        feriasTable += '</table>';
+        document.getElementById('feriasOutput').innerHTML = feriasTable;
+    } else {
+        document.getElementById('feriasOutput').innerHTML = '<p>Data de posse não encontrada.</p>';
+    }
+}
+
+function calculateExercicios(posseDate) {
+    let exercicios = [];
+    let currentDate = new Date(posseDate);
+
+    for (let i = 0; i < 25; i++) {
+        const start = new Date(currentDate);
+        const end = new Date(currentDate);
+        end.setFullYear(start.getFullYear() + 1);
+        end.setDate(end.getDate() - 1);
+
+        exercicios.push({
+            inicio: formatDate(start),
+            termino: formatDate(end)
+        });
+
+        currentDate.setFullYear(currentDate.getFullYear() + 1);
+        if (isLeapYear(currentDate.getFullYear())) {
+            currentDate.setDate(currentDate.getDate() - 1);
+        }
     }
 
-    function preencherFormulario(dadosSistema) {
-        document.getElementById('nome').value = extrairInfo(dadosSistema, 'Servidor:', 'ILS');
-        document.getElementById('matricula').value = extrairInfo(dadosSistema, 'Mat:', 'Sit:');
+    return exercicios;
+}
 
-        const cargoCompleto = extrairInfo(dadosSistema, 'Crg:', '$');
-        const cargoMatch = cargoCompleto.match(/[A-Z][^:]+/);
-        if (cargoMatch) {
-            document.getElementById('cargo').value = cargoMatch[0].trim();
-        } else {
-            document.getElementById('cargo').value = '';
-        }
+function formatDate(date) {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+}
 
-        const lotacaoCompleta = extrairInfo(dadosSistema, 'U.A:', 'Carga');
-        const lotacaoMatch = lotacaoCompleta.match(/\d+(.+)/);
-        document.getElementById('lotacao').value = lotacaoMatch ? lotacaoMatch[1].trim() : lotacaoCompleta;
+function calcularDataFinal(inicio, dias) {
+    const [dia, mes, ano] = inicio.split('/').map(Number);
+    let dataInicio = new Date(ano, mes - 1, dia);
+    
+    dataInicio.setDate(dataInicio.getDate() + parseInt(dias) - 1);
+    
+    const diaFinal = dataInicio.getDate().toString().padStart(2, '0');
+    const mesFinal = (dataInicio.getMonth() + 1).toString().padStart(2, '0');
+    const anoFinal = dataInicio.getFullYear();
+    
+    return `${diaFinal}/${mesFinal}/${anoFinal}`;
+}
 
-        const dataApresentacao = extrairInfo(dadosSistema, 'Data Apres:', 'Tipo Função');
-        if (dataApresentacao) {
-            const dataAdmissao = new Date(dataApresentacao.replace(/(\d{2})(\d{2})(\d{4})/, '$3-$2-$1'));
-            document.getElementById('dataAdmissao').value = dataAdmissao.toISOString().split('T')[0];
-            
-            const hoje = new Date();
-            const anoAtual = hoje.getFullYear();
-            const dataInicioExercicio = new Date(anoAtual, dataAdmissao.getMonth(), dataAdmissao.getDate());
-            if (hoje < dataInicioExercicio) {
-                dataInicioExercicio.setFullYear(anoAtual - 1);
-            }
-            document.getElementById('exercicioInicio').value = dataInicioExercicio.toISOString().split('T')[0];
+function gerarTexto() {
+    const servidorNome = document.getElementById('servidorNome').value.trim();
+    const cargo = document.getElementById('cargo').value.trim();
+    const matricula = document.getElementById('matricula').value.trim();
+    const lotacao = document.getElementById('lotacao').value.trim();
+    const diasFerias = document.getElementById('diasFerias').value.trim();
+    const exercicio = document.getElementById('exercicio').value.trim();
+    const inicioFerias = document.getElementById('inicioFerias').value.trim();
 
-            const dataFimExercicio = new Date(dataInicioExercicio);
-            dataFimExercicio.setFullYear(dataFimExercicio.getFullYear() + 1);
-            dataFimExercicio.setDate(dataFimExercicio.getDate() - 1);
-            document.getElementById('exercicioFim').value = dataFimExercicio.toISOString().split('T')[0];
-        }
-
-        const dataAtual = new Date();
-        const mesAtual = String(dataAtual.getMonth() + 1).padStart(2, '0');
-        const anoAtual = dataAtual.getFullYear();
-        document.getElementById('numero').value = `${mesAtual}/${anoAtual}`;
-
-        validarCampos();
+    if (!servidorNome || !cargo || !matricula || !lotacao || !diasFerias || !exercicio || !inicioFerias) {
+        alert("Por favor, preencha todos os campos.");
+        return;
     }
 
-    function validarCampos() {
-        const campos = ['nome', 'matricula', 'cargo', 'lotacao', 'dataAdmissao', 'exercicioInicio', 'exercicioFim'];
-        campos.forEach(campo => {
-            const elemento = document.getElementById(campo);
-            if (elemento.value) {
-                elemento.classList.add('is-valid');
-                elemento.classList.remove('is-invalid');
-            } else {
-                elemento.classList.add('is-invalid');
-                elemento.classList.remove('is-valid');
+    const diasFeriasNum = parseInt(diasFerias, 10);
+    if (isNaN(diasFeriasNum) || diasFeriasNum <= 0 || diasFeriasNum > 30) {
+        alert("Por favor, insira um número válido de dias de férias (1-30).");
+        return;
+    }
+
+    const fimFerias = calcularDataFinal(inicioFerias, diasFerias);
+    document.getElementById('fimFerias').value = fimFerias;
+
+    const texto = `Senhor Diretor,
+
+Pelo presente, comunicamos que de acordo com o Artigo 62 da Lei nº 1.762 de 14 de novembro de 1986, ser-lhe-ão concedidos ao(à) servidor(a) ${servidorNome}, cargo ${cargo}, matrícula ${matricula}, lotado(a) ${lotacao}, ${diasFerias} (${diasFeriasPorExtenso(diasFerias)}) dias de férias, referente ao exercício ${exercicio} (${exercicioFormatado(exercicio)}) as quais deverão ser gozadas no período de ${inicioFerias} a ${fimFerias}.
+
+CIENTE EM: ____/____/________
+
+SERVIDOR(A): ____________________________________________
+
+Obs.: ________________________________________________________
+
+Atenciosamente,
+
+ANTONIA IONETE VIDINHA BARROSO
+Gerente GPREV/DGP/SEDUC
+Decreto de 03/08/2023
+
+Mauro Frank Lima de Lima
+ASSISTENTE TECNICO PNM.ANM-III
+Matrícula 227341-1A`;
+
+    document.getElementById('textoOutput').innerText = texto;
+}
+
+function diasFeriasPorExtenso(dias) {
+    const numeros = ['ZERO', 'UM', 'DOIS', 'TRÊS', 'QUATRO', 'CINCO', 'SEIS', 'SETE', 'OITO', 'NOVE', 'DEZ',
+                     'ONZE', 'DOZE', 'TREZE', 'QUATORZE', 'QUINZE', 'DEZESSEIS', 'DEZESSETE', 'DEZOITO', 'DEZENOVE', 'VINTE',
+                     'VINTE E UM', 'VINTE E DOIS', 'VINTE E TRÊS', 'VINTE E QUATRO', 'VINTE E CINCO', 'VINTE E SEIS', 'VINTE E SETE', 'VINTE E OITO', 'VINTE E NOVE', 'TRINTA'];
+    return numeros[parseInt(dias)] || dias;
+}
+
+function exercicioFormatado(exercicio) {
+    const [inicio, fim] = exercicio.split('/');
+    return `01/03/${inicio} a 28/02/${fim}`;
+}
+
+// Preencher automaticamente os campos do formulário com os dados da tabela
+document.addEventListener('DOMContentLoaded', function() {
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.type === 'childList' && mutation.target.id === 'output') {
+                preencherFormulario();
             }
         });
-    }
-
-    function calcularDatasFerias() {
-        const diasSolicitados = parseInt(document.getElementById('diasSolicitados').value) || 0;
-        const dataInicio = new Date(document.getElementById('feriasInicio').value);
-        
-        if (!isNaN(dataInicio.getTime())) {
-            const dataFim = new Date(dataInicio);
-            dataFim.setDate(dataInicio.getDate() + diasSolicitados - 1);
-            document.getElementById('feriasFim').value = dataFim.toISOString().split('T')[0];
-            
-            const dataRetorno = new Date(dataFim);
-            dataRetorno.setDate(dataFim.getDate() + 1);
-            document.getElementById('dataRetorno').value = dataRetorno.toISOString().split('T')[0];
-        }
-    }
-
-    function numeroPorExtenso(numero) {
-        const unidades = ['', 'um', 'dois', 'três', 'quatro', 'cinco', 'seis', 'sete', 'oito', 'nove'];
-        const dezenas = ['', 'dez', 'vinte', 'trinta', 'quarenta', 'cinquenta', 'sessenta', 'setenta', 'oitenta', 'noventa'];
-        const dezenasEspeciais = ['dez', 'onze', 'doze', 'treze', 'quatorze', 'quinze', 'dezesseis', 'dezessete', 'dezoito', 'dezenove'];
-
-        if (numero < 10) return unidades[numero];
-        if (numero < 20) return dezenasEspeciais[numero - 10];
-        if (numero < 100) {
-            const dezena = Math.floor(numero / 10);
-            const unidade = numero % 10;
-            return dezenas[dezena] + (unidade ? ' e ' + unidades[unidade] : '');
-        }
-        return numero.toString();
-    }
-
-    function generateNewMemorandoNumber() {
-        const date = new Date();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const year = date.getFullYear();
-        const randomNum = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-        return `${month}/${year}-${randomNum}`;
-    }
-
-    function clearFormAndGenerateNewNumber() {
-        document.getElementById('memorandoForm').reset();
-        document.getElementById('memorando').style.display = 'none';
-        document.getElementById('numero').value = generateNewMemorandoNumber();
-        
-        const formInputs = document.getElementById('memorandoForm').elements;
-        for (let input of formInputs) {
-            input.classList.remove('is-valid', 'is-invalid');
-        }
-    }
-
-    document.getElementById('formatarDados').addEventListener('click', formatarDados);
-
-    document.getElementById('diasSolicitados').addEventListener('input', calcularDatasFerias);
-    document.getElementById('feriasInicio').addEventListener('input', calcularDatasFerias);
-
-    document.getElementById('feriaForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const dataAdmissao = new Date(document.getElementById('dataAdmissao').value);
-        const periodos = calcularPeriodosFerias(dataAdmissao);
-        
-        const tbody = document.querySelector('#tabelaFerias tbody');
-        tbody.innerHTML = '';
-        
-        periodos.forEach(p => {
-            const row = tbody.insertRow();
-            row.insertCell(0).textContent = `${p.periodo}º Período`;
-            row.insertCell(1).textContent = p.inicio.toLocaleDateString('pt-BR');
-            row.insertCell(2).textContent = p.fim.toLocaleDateString('pt-BR');
-            row.insertCell(3).textContent = p.anoReferencia;
-            const cellRadio = row.insertCell(4);
-            const radioBtn = document.createElement('input');
-            radioBtn.type = 'radio';
-            radioBtn.name = 'periodoSelecionado';
-            radioBtn.value = p.periodo;
-            radioBtn.dataset.inicio = p.inicio.toISOString().split('T')[0];
-            radioBtn.dataset.fim = p.fim.toISOString().split('T')[0];
-            radioBtn.addEventListener('change', function() {
-                document.getElementById('exercicioInicio').value = this.dataset.inicio;
-                document.getElementById('exercicioFim').value = this.dataset.fim;
-            });
-            cellRadio.appendChild(radioBtn);
-        });
-        
-        document.getElementById('resultados').style.display = 'block';
     });
 
-    document.getElementById('memorandoForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        document.getElementById('memorando').style.display = 'block';
-    });
+    observer.observe(document.getElementById('output'), { childList: true });
+});
 
-    document.getElementById('limparFormulario').addEventListener('click', clearFormAndGenerateNewNumber);
+function preencherFormulario() {
+    const table = document.querySelector('#output table');
+    if (!table) return;
 
-    document.getElementById('gerarPdf').addEventListener('click', function() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        
-        doc.setFontSize(12);
-        doc.setFont("helvetica", "normal");
-        
-        const dataAtual = new Date().toLocaleDateString('pt-BR');
-        const numero = document.getElementById("numero").value;
-        const nome = document.getElementById("nome").value;
-        const cargo = document.getElementById("cargo").value;
-        const matricula = document.getElementById("matricula").value;
-        const lotacao = document.getElementById("lotacao").value;
-        const exercicioInicio = new Date(document.getElementById("exercicioInicio").value).getFullYear();
-        const diasSolicitados = document.getElementById("diasSolicitados").value;
-        const feriasInicio = new Date(document.getElementById("feriasInicio").value).toLocaleDateString('pt-BR');
-        const feriasFim = new Date(document.getElementById("feriasFim").value).toLocaleDateString('pt-BR');
-        const observacoes = document.getElementById("observacoes").value;
-        
-        let yPos = 20;
-        const lineHeight = 7;
-        
-        doc.text(`Manaus, ${dataAtual}`, 20, yPos); yPos += lineHeight * 2;
-        doc.text(`MEMORANDO DE FÉRIAS Nº ${numero} – GPREV/DGP/SEDUC`, 20, yPos); yPos += lineHeight;
-        doc.text(`DA: GERÊNCIA DE CADASTRO E APOSENTADORIA - GECAP/DGP`, 20, yPos); yPos += lineHeight;
-        doc.text(`AO: ${lotacao}`, 20, yPos); yPos += lineHeight * 2;
-        
-        doc.text(`Senhor Diretor,`, 20, yPos); yPos += lineHeight * 2;
-        
-        const texto = `Pelo Presente, comunicamos que de acordo com o Artigo 62 da Lei nº 1.762 de 14 de novembro de 1986, ser-lhe-ão concedidos ao(à) servidor(a) ${nome}, cargo ${cargo}, matrícula ${matricula}, lotado(a) ${lotacao}, ${diasSolicitados} (${numeroPorExtenso(parseInt(diasSolicitados))}) dias de férias, referente ao exercício ${exercicioInicio} as quais deverão ser gozadas no período de ${feriasInicio} a ${feriasFim}.`;
-        
-        const linhas = doc.splitTextToSize(texto, 170);
-        doc.text(linhas, 20, yPos);
-        yPos += lineHeight * (linhas.length + 2);
-        
-        doc.text(`CIENTE EM:`, 20, yPos); yPos += lineHeight * 2;
-        doc.text(`SERVIDOR (A):____________________________________________`, 20, yPos); yPos += lineHeight * 2;
-        
-        if (observacoes) {
-            doc.text(`Obs.: ${observacoes}`, 20, yPos);
-            yPos += lineHeight * 4;
-        } else {
-            doc.text(`Obs.: ___________________________________________________`, 20, yPos); yPos += lineHeight;
-            doc.text(`__________________________________________________________`, 20, yPos); yPos += lineHeight;
-            doc.text(`__________________________________________________________`, 20, yPos); yPos += lineHeight;
-            doc.text(`__________________________________________________________`, 20, yPos); yPos += lineHeight * 2;
+    const rows = table.querySelectorAll('tr');
+    const data = {};
+
+    rows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+        if (cells.length === 2) {
+            data[cells[0].textContent.trim()] = cells[1].textContent.trim();
         }
-        
-        doc.text(`Atenciosamente,`, 20, yPos); yPos += lineHeight * 4;
-        
-        doc.text(`ANTONIA IONETE VIDINHA BARROSO`, 20, yPos); yPos += lineHeight;
-        doc.text(`Gerente GPREV/DGP/SEDUC`, 20, yPos); yPos += lineHeight;
-        doc.text(`Decreto de 03/08/2023`, 20, yPos); yPos += lineHeight * 2;
-        
-        doc.text(`Mauro Frank Lima de Lima`, 20, yPos); yPos += lineHeight;
-        doc.text(`ASSISTENTE TECNICO PNM.ANM-III`, 20, yPos); yPos += lineHeight;
-        doc.text(`Matrícula 227341-1A`, 20, yPos);
-        
-        doc.save("memorando_ferias.pdf");
     });
+
+    document.getElementById('servidorNome').value = data['Servidor'] || '';
+    document.getElementById('cargo').value = data['Cargo'] || '';
+    document.getElementById('matricula').value = data['Matrícula'] || '';
+    document.getElementById('lotacao').value = data['Lotação'] || '';
+    
+    const currentYear = new Date().getFullYear();
+    document.getElementById('exercicio').value = `${currentYear}/${currentYear + 1}`;
+    document.getElementById('diasFerias').value = '30';
+
+    const today = new Date();
+    const startDate = new Date(today.setMonth(today.getMonth() + 3));
+    const endDate = new Date(startDate);
+    endDate.setDate(endDate.getDate() + 29);
+
+    document.getElementById('inicioFerias').value = formatDate(startDate);
+    document.getElementById('fimFerias').value = formatDate(endDate);
+}
+
+document.getElementById('inicioFerias').addEventListener('change', updateFimFerias);
+document.getElementById('diasFerias').addEventListener('change', updateFimFerias);
+
+function updateFimFerias() {
+    const inicioFerias = document.getElementById('inicioFerias').value.trim();
+    const diasFerias = document.getElementById('diasFerias').value.trim();
+    
+    if (inicioFerias && diasFerias) {
+        const fimFerias = calcularDataFinal(inicioFerias, diasFerias);
+        document.getElementById('fimFerias').value = fimFerias;
+    }
+}
