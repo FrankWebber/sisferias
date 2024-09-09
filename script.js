@@ -2,18 +2,12 @@ function recarregarPagina() {
             location.reload();
         }
 
-
-
-
-
-
-
-
 function extrairInfo(texto, chave, ateCaracter = '') {
-        const regex = new RegExp(chave + "\\s*:?\\s*(.*?)(?=" + ateCaracter + "|$)", "i");
-        const match = texto.match(regex);
-        return match ? match[1].trim() : '';
-    }
+    // Adaptando o padrão de busca para espaços e múltiplas ocorrências
+    const regex = new RegExp(chave + "\\s*:?\\s*(.*?)(?=" + (ateCaracter ? ateCaracter : "\\s{2,}|$") + ")", "i");
+    const match = texto.match(regex);
+    return match ? match[1].trim() : '';
+}
 
     function calcularPeriodosFerias(dataAdmissao) {
         const hoje = new Date();
