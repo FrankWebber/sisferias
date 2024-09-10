@@ -1,8 +1,10 @@
-<html><head><base href="https://websim.io"><meta charset="UTF-8"><title>Sistema de Gestão de Servidores - Otimizado</title>
+<html><head>
+    <meta charset="UTF-8"><title>Sistema de Gestão de Servidores - Otimizado</title>
 
-    <link rel="stylesheet" href="styles.css">
+    
     
 </head>
+    <link rel="stylesheet" href="styles.css">
 <body>
     <h1>Sistema de Gestão de Servidores - Otimizado</h1>
     
@@ -13,46 +15,64 @@
     <div id="output"></div>
     
     <h2>Exercícios de Férias</h2>
-    <div id="feriasOutput"></div>
+    <div id="feriasOutput">
+        <table>
+            <tr>
+                <th>Exercício</th>
+                <th>Início</th>
+                <th>Até</th>
+                <th>Término</th>
+                <th>Selecionar</th>
+            </tr>
+            <!-- Os dados da tabela serão preenchidos dinamicamente pelo JavaScript -->
+        </table>
+    </div>
 
     <h2>Gerar Texto de Comunicação</h2>
     <form id="textoForm">
         <div class="form-group">
             <label for="servidorNome">Nome do Servidor:</label>
-            <input type="text" id="servidorNome" placeholder="Nome do Servidor" required="">
+            <input type="text" id="servidorNome" placeholder="Nome do Servidor" required>
         </div>
         <div class="form-group">
             <label for="cargo">Cargo:</label>
-            <input type="text" id="cargo" placeholder="Cargo" required="">
+            <input type="text" id="cargo" placeholder="Cargo" required>
         </div>
         <div class="form-group">
             <label for="matricula">Matrícula:</label>
-            <input type="text" id="matricula" placeholder="Matrícula" required="">
+            <input type="text" id="matricula" placeholder="Matrícula" required>
         </div>
         <div class="form-group">
             <label for="lotacao">Lotação:</label>
-            <input type="text" id="lotacao" placeholder="Lotação" required="">
+            <input type="text" id="lotacao" placeholder="Lotação" required>
+        </div>
+        <div class="form-group">
+            <label>Período de Férias:</label>
+            <div class="radio-group" id="periodoFerias">
+                <!-- Opções de período serão preenchidas dinamicamente -->
+            </div>
         </div>
         <div class="form-group">
             <label for="diasFerias">Dias de Férias:</label>
-            <input type="text" id="diasFerias" placeholder="Dias de Férias" required="">
+            <input type="text" id="diasFerias" placeholder="Dias de Férias" required>
         </div>
         <div class="form-group">
             <label for="exercicio">Exercício:</label>
-            <input type="text" id="exercicio" placeholder="Exercício (ex: 2023/2024)" required="">
+            <input type="text" id="exercicio" placeholder="Exercício (ex: 2023/2024)" required>
         </div>
         <div class="form-group">
             <label for="inicioFerias">Início das Férias:</label>
-            <input type="text" id="inicioFerias" placeholder="DD/MM/AAAA" required="">
+            <input type="text" id="inicioFerias" placeholder="DD/MM/AAAA" required>
         </div>
         <div class="form-group">
             <label for="fimFerias">Fim das Férias:</label>
-            <input type="text" id="fimFerias" placeholder="DD/MM/AAAA" required="" readonly="">
+            <input type="text" id="fimFerias" placeholder="DD/MM/AAAA" required readonly>
         </div>
         <button type="button" onclick="gerarTexto()">Gerar Texto</button>
     </form>
     
     <div id="textoOutput"></div>
+
 
     <script src="script.js"></script>
 </body>
