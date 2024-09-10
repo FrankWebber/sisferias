@@ -70,6 +70,7 @@ function convertToTable() {
                     <th>Início</th>
                     <th>Até</th>
                     <th>Término</th>
+                    <th>Selecionar</th>
                 </tr>
         `;
 
@@ -80,12 +81,15 @@ function convertToTable() {
                     <td>${ex.inicio}</td>
                     <td>a</td>
                     <td>${ex.termino}</td>
+                    <td><input type="radio" name="exercicio_selecionado" id="${ex.id}" value="${year + index}/${year + index + 1}" onchange="preencherExercicioSelecionado(this)"></td>
                 </tr>
             `;
         });
 
         feriasTable += '</table>';
         document.getElementById('feriasOutput').innerHTML = feriasTable;
+        
+        preencherOpcoesPeriodo(exercicios);
     } else {
         document.getElementById('feriasOutput').innerHTML = '<p>Data de posse não encontrada.</p>';
     }
@@ -102,6 +106,7 @@ function calculateExercicios(posseDate) {
         end.setDate(end.getDate() - 1);
 
         exercicios.push({
+            id: `exercicio_${i}`,
             inicio: formatDate(start),
             termino: formatDate(end)
         });
@@ -193,7 +198,6 @@ function exercicioFormatado(exercicio) {
     return `01/03/${inicio} a 28/02/${fim}`;
 }
 
-// Preencher automaticamente os campos do formulário com os dados da tabela
 document.addEventListener('DOMContentLoaded', function() {
     const observer = new MutationObserver(function(mutations) {
         mutations.forEach(function(mutation) {
@@ -249,4 +253,39 @@ function updateFimFerias() {
         const fimFerias = calcularDataFinal(inicioFerias, diasFerias);
         document.getElementById('fimFerias').value = fimFerias;
     }
+}
+
+function preencherOpcoesPeriodo(exercicios) {
+    const periodoFeriasDiv = document.getElementById('periodoFerias');
+    periodoFeriasDiv.innerHTML = ''; // Limpa as opções existentes
+
+    exercicios.forEach((ex, index) => {
+        const option = document.createElement('div');
+        option.className = 'radio-option';
+        option.innerHTML = `
+            <input type="radio" id="periodo${index}" name="periodoFerias" value="${index}">
+            <label for="periodo${index}">${ex.inicio} a ${ex.termino}</label>
+        `;
+        periodoFeriasDiv.appendChild(option);
+
+        option.querySelector('input[type="radio"]').addEventListener('change', function() {
+            if (this.checked) {
+                document.getElementById('exercicio').value = `${ex.inicio.split('/')[2]}/${parseInt(ex.inicio.split('/')[2]) + 1}`;
+                document.getElementById('inicioFerias').value = ex.inicio;
+                updateFimFerias();
+            }
+        });
+    });
+}
+
+function preencherExercicioSelecionado(radio) {
+    const exercicioSelecionado = radio.value;
+    document.getElementById('exercicio').value = exercicioSelecionado;
+    
+    const [anoInicio, anoFim] = exercicioSelecionado.split('/');
+    document.getElementById('inicioFerias').value = `01/03/${anoInicio}`;
+    document.getElementById('fimFerias').value = `28/02/${anoFim}`;
+    
+    document.getElementById('diasFerias').value = '30';
+    updateFimFerias();
 }
