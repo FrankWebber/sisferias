@@ -1,4 +1,4 @@
-body {
+    body {
         font-family: Arial, sans-serif;
         margin: 20px;
         padding: 20px;
@@ -76,4 +76,20 @@ body {
     .error {
         color: red;
         font-size: 0.9em;
+    }
+    .radio-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+    .radio-option {
+        display: flex;
+        align-items: center;
+    }
+    .radio-option input[type="radio"] {
+        margin-right: 5px;
+    }
+    input[type="radio"] {
+        margin-right: 5px;
     }
