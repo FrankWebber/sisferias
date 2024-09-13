@@ -1,3 +1,4 @@
+
     body {
         font-family: Arial, sans-serif;
         margin: 20px;
@@ -9,7 +10,7 @@
         color: #333;
         text-align: center;
     }
-    textarea, input[type="text"] {
+    textarea, input[type="text"], input[type="date"], select {
         width: 100%;
         padding: 10px;
         margin-bottom: 10px;
@@ -54,14 +55,14 @@
     tr:nth-child(even) {
         background-color: #f2f2f2;
     }
-    #output, #feriasOutput, #textoOutput {
+    #output, #feriasOutput, #textoOutput, #todosMemorandos {
         margin-top: 30px;
         background-color: white;
         padding: 20px;
         border-radius: 4px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-    #textoOutput {
+    #textoOutput, #todosMemorandos {
         white-space: pre-wrap;
         font-family: 'Courier New', Courier, monospace;
     }
@@ -92,4 +93,13 @@
     }
     input[type="radio"] {
         margin-right: 5px;
+    }
+    #todosMemorandos {
+        margin-top: 30px;
+        background-color: white;
+        padding: 20px;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        white-space: pre-wrap;
+        font-family: 'Courier New', Courier, monospace;
     }
