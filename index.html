@@ -8,16 +8,18 @@
 <body>
     <h1>Sistema de Gestão de Servidores - Otimizado</h1>
     
+    <h2>Data Atual: <span id="dataAtual"></span></h2>
+    
     <h2>Conversor de Texto para Tabela e Cálculo de Férias</h2>
     <textarea id="inputText" placeholder="Cole o texto aqui..."></textarea>
-    <button onclick="convertToTable()">Converter e Calcular Exercícios</button>
+    <button onclick="convertToTable()"> converter e calcular exercícios </button>
     
     <div id="output"></div>
     
     <h2>Exercícios de Férias</h2>
     <div id="feriasOutput">
         <table>
-            <tr>
+            <tbody><tr>
                 <th>Exercício</th>
                 <th>Início</th>
                 <th>Até</th>
@@ -25,26 +27,34 @@
                 <th>Selecionar</th>
             </tr>
             <!-- Os dados da tabela serão preenchidos dinamicamente pelo JavaScript -->
-        </table>
+        </tbody></table>
     </div>
 
     <h2>Gerar Texto de Comunicação</h2>
     <form id="textoForm">
         <div class="form-group">
             <label for="servidorNome">Nome do Servidor:</label>
-            <input type="text" id="servidorNome" placeholder="Nome do Servidor" required>
+            <input type="text" id="servidorNome" placeholder="Nome do Servidor" required="">
         </div>
         <div class="form-group">
             <label for="cargo">Cargo:</label>
-            <input type="text" id="cargo" placeholder="Cargo" required>
+            <input type="text" id="cargo" placeholder="Cargo" required="">
         </div>
         <div class="form-group">
             <label for="matricula">Matrícula:</label>
-            <input type="text" id="matricula" placeholder="Matrícula" required>
+            <input type="text" id="matricula" placeholder="Matrícula" required="">
         </div>
         <div class="form-group">
             <label for="lotacao">Lotação:</label>
-            <input type="text" id="lotacao" placeholder="Lotação" required>
+            <input type="text" id="lotacao" placeholder="Lotação" required="">
+        </div>
+        <div class="form-group">
+            <label for="ingresso">Ingresso:</label>
+            <input type="text" id="ingresso" placeholder="Ingresso" readonly="">
+        </div>
+        <div class="form-group">
+            <label for="dataPosse">Data de Posse:</label>
+            <input type="date" id="dataPosse" required="">
         </div>
         <div class="form-group">
             <label>Período de Férias:</label>
@@ -54,26 +64,53 @@
         </div>
         <div class="form-group">
             <label for="diasFerias">Dias de Férias:</label>
-            <input type="text" id="diasFerias" placeholder="Dias de Férias" required>
+            <input type="text" id="diasFerias" placeholder="Dias de Férias" required="">
         </div>
         <div class="form-group">
             <label for="exercicio">Exercício:</label>
-            <input type="text" id="exercicio" placeholder="Exercício (ex: 2023/2024)" required>
+            <input type="text" id="exercicio" placeholder="Exercício (ex: 2023/2024)" required="">
         </div>
         <div class="form-group">
             <label for="inicioFerias">Início das Férias:</label>
-            <input type="text" id="inicioFerias" placeholder="DD/MM/AAAA" required>
+            <input type="text" id="inicioFerias" placeholder="DD/MM/AAAA" required="">
         </div>
         <div class="form-group">
             <label for="fimFerias">Fim das Férias:</label>
-            <input type="text" id="fimFerias" placeholder="DD/MM/AAAA" required readonly>
+            <input type="text" id="fimFerias" placeholder="DD/MM/AAAA" required="" readonly="">
+        </div>
+        <div class="form-group">
+            <label for="assistente">Assistente:</label>
+            <select id="assistente" required="">
+                <option value="">Selecione um assistente</option>
+                <option value="Adnamar de Souza Mello|Professor Pf20.lpl-IV|129.479-2 C">Adnamar de Souza Mello</option>
+                <option value="Ana Claudia Rocha Maciel Rios|Aux.de Serv.gerais Pnf.asg-II|184.866-6 A">Ana Claudia Rocha Maciel Rios</option>
+                <option value="Antonia Ionete Vidinha Barroso|Merendeiro Pnf.mnf-II|185.895-5 A">Antonia Ionete Vidinha Barroso</option>
+                <option value="Astrid Oliveira de Menezes|Assistente Administrativo|123.003-4 B">Astrid Oliveira de Menezes</option>
+                <option value="Celi Felix de Queiroz|Assistente Tecnico Pnm.anm-III|227.615-1 A">Celi Felix de Queiroz</option>
+                <option value="Dalton Gomes Vicente|Assistente Tecnico Pnm.anm-III|227.658-5 A">Dalton Gomes Vicente</option>
+                <option value="Edileida Cabral Campos da Silva|Assistente Administrativo|143.168-4 B">Edileida Cabral Campos da Silva</option>
+                <option value="Elizabeth Palmeira Neves|Professor Pf20.esp-III|017.775-0 D">Elizabeth Palmeira Neves</option>
+                <option value="Ellen Karen Mello Barauna|Assistente Tecnico Pnm.anm-III|223.122-0 A">Ellen Karen Mello Barauna</option>
+                <option value="Francisco Pinto Junior|Assistente Tecnico Pnm.anm-III|222.933-1 A">Francisco Pinto Junior</option>
+                <option value="Fredson da Rocha Fernandes|Aux.de Serv.gerais Pnf.asg-II|183.748-6 A">Fredson da Rocha Fernandes</option>
+                <option value="Jadir da Rocha Nina Junior|Assistente Tecnico Pnm.anm-III|223.144-1 A">Jadir da Rocha Nina Junior</option>
+                <option value="Maria Leonice Dias da Silva de Souz|Assistente Tecnico Pnm.anm-III|226.254-1 A">Maria Leonice Dias da Silva de Souz</option>
+                <option value="Mauro Frank Lima de Lima|Assistente Tecnico Pnm.anm-III|227.341-1 A">Mauro Frank Lima de Lima</option>
+                <option value="Paulo Celio Silva de Matos|Assistente Tecnico Pnm.anm-III|239.063-9 A">Paulo Celio Silva de Matos</option>
+                <option value="Romilson Maciel de Oliveira|Assistente Administrativo|120.685-0 B">Romilson Maciel de Oliveira</option>
+                <option value="Sanje de Oliveira Vasconcelos|Assessor IIi|119.682-0 I">Sanje de Oliveira Vasconcelos</option>
+                <option value="Suelane Gomes Lopes Cruz|Assistente Administrativo|014.206-9 B">Suelane Gomes Lopes Cruz</option>
+                <option value="William Menezes Bastos|Assistente Tecnico Pnm.anm-III|227.224-5 A">William Menezes Bastos</option>
+                <option value="Yann Kristoffer Monteiro Lorenzoni|Assistente Tecnico Pnm.anm-III|223.175-1 A">Yann Kristoffer Monteiro Lorenzoni</option>
+            </select>
         </div>
         <button type="button" onclick="gerarTexto()">Gerar Texto</button>
     </form>
     
     <div id="textoOutput"></div>
 
-
+    <button onclick="gerarTodosMemorandos()">Gerar Todos os Memorandos</button>
+    <div id="todosMemorandos"></div>
     <script src="script.js"></script>
 </body>
 </html>
