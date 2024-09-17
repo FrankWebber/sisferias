@@ -347,9 +347,18 @@ function gerarTodosMemorandos() {
 
     exercicios.forEach((ex, index) => {
         const currentDate = getCurrentDate();
-        if (new Date(ex.termino.split('/').reverse().join('-')) > currentDate) {
+        const periodoAquisitivoFim = new Date(ex.termino.split('/').reverse().join('-'));
+
+        if (periodoAquisitivoFim > currentDate) {
             return; // Skip future exercises
         }
+
+        // Start date of vacation is one year after the end of the acquisition period
+        const inicioFerias = new Date(periodoAquisitivoFim);
+        inicioFerias.setDate(inicioFerias.getDate() + 1);
+
+        const fimFerias = new Date(inicioFerias);
+        fimFerias.setDate(fimFerias.getDate() + 29); // 30 days vacation
 
         const memorando = `Memorando N° ${(index + 1).toString().padStart(3, '0')}/${ex.inicio.split('/')[2]}-CPS/SEDUC
 Manaus, 01/08/${ex.inicio.split('/')[2]}.
@@ -358,7 +367,7 @@ Manaus, 01/08/${ex.inicio.split('/')[2]}.
 
 Assunto: Requerimento de Férias.
 
-Venho respeitosamente solicitar, conforme documento anexo, o gozo de férias referente ao ${ex.anoServico}º ano de serviço, período aquisitivo de ${ex.periodoAquisitivoInicio} a ${ex.periodoAquisitivoFim}, a serem usufruídas no período de ${ex.inicio} a ${ex.termino}.
+Venho respeitosamente solicitar, conforme documento anexo, o gozo de férias referente ao ${ex.anoServico}º ano de serviço, período aquisitivo de ${ex.periodoAquisitivoInicio} a ${ex.periodoAquisitivoFim}, a serem usufruídas no período de ${formatDate(inicioFerias)} a ${formatDate(fimFerias)}.
 
 Atenciosamente,
 ${servidorNome}
