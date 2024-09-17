@@ -358,7 +358,7 @@ function gerarTodosMemorandos() {
         inicioFerias.setDate(inicioFerias.getDate() + 1);
 
         const fimFerias = new Date(inicioFerias);
-        fimFerias.setDate(fimFerias.getDate() + 29); // 30 days vacation
+        fimFerias.setDate(inicioFerias.getDate() + 29); // 30 days vacation
 
         const memorando = `Memorando N° ${(index + 1).toString().padStart(3, '0')}/${ex.inicio.split('/')[2]}-CPS/SEDUC
 Manaus, 01/08/${ex.inicio.split('/')[2]}.
