@@ -353,7 +353,7 @@ function gerarTodosMemorandos() {
             return; // Skip future exercises
         }
 
-        // Start date of vacation is one day after the end of the acquisition period
+        // Correct start date: one day after the end of the acquisition period
         const inicioFerias = new Date(periodoAquisitivoFim);
         inicioFerias.setDate(inicioFerias.getDate() + 1);
 
