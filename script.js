@@ -337,29 +337,56 @@ function gerarTodosMemorandos() {
     const matricula = document.getElementById('matricula').value.trim();
     const dataPosse = document.getElementById('dataPosse').value.trim();
 
+    // Verifica se todos os campos obrigatórios estão preenchidos
     if (!servidorNome || !cargo || !matricula || !dataPosse) {
         alert("Por favor, preencha todos os campos necessários.");
         return;
     }
 
+    // Função auxiliar para converter uma string de data no formato dd/mm/yyyy para um objeto Date
+    function parseDate(dateStr) {
+        const [day, month, year] = dateStr.split('/');
+        return new Date(`${year}-${month}-${day}`);
+    }
+
+    // Função auxiliar para formatar a data no padrão dd/mm/yyyy
+    function formatDate(date) {
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+    }
+
+    // Função para obter a data atual corretamente
+    function getCurrentDate() {
+        return new Date();
+    }
+
+    // Calcula os exercícios com base na data de posse
     const exercicios = calculateExercicios(new Date(dataPosse));
     let memorandos = '';
 
+    // Itera sobre os exercícios e gera os memorandos
     exercicios.forEach((ex, index) => {
         const currentDate = getCurrentDate();
-        const periodoAquisitivoFim = new Date(ex.termino.split('/').reverse().join('-'));
+        const periodoAquisitivoFim = parseDate(ex.termino); // Converte string de data para Date
 
+        console.log(`Período aquisitivo fim: ${periodoAquisitivoFim}`);
+        console.log(`Data atual: ${currentDate}`);
+
+        // Ignora períodos futuros
         if (periodoAquisitivoFim > currentDate) {
-            return; // Skip future exercises
+            return;
         }
 
-        // Correct start date: one day after the end of the acquisition period
+        // Calcula a data de início e fim das férias
         const inicioFerias = new Date(periodoAquisitivoFim);
-        inicioFerias.setDate(inicioFerias.getDate() + 1);
+        inicioFerias.setDate(inicioFerias.getDate() + 1); // Início das férias: dia seguinte ao término do período aquisitivo
 
         const fimFerias = new Date(inicioFerias);
-        fimFerias.setDate(fimFerias.getDate() + 29); // 30 days vacation
+        fimFerias.setDate(fimFerias.getDate() + 29); // 30 dias de férias
 
+        // Gera o texto do memorando
         const memorando = `Memorando N° ${(index + 1).toString().padStart(3, '0')}/${ex.inicio.split('/')[2]}-CPS/SEDUC
 Manaus, 01/08/${ex.inicio.split('/')[2]}.
 
@@ -373,11 +400,11 @@ Atenciosamente,
 ${servidorNome}
 ${cargo}
 Matrícula: ${matricula}
-
 `;
 
         memorandos += memorando + '\n\n';
     });
 
+    // Exibe os memorandos gerados na página
     document.getElementById('todosMemorandos').innerText = memorandos;
 }
