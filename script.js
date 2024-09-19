@@ -381,10 +381,10 @@ function gerarTodosMemorandos() {
 
         // Calcula a data de início e fim das férias
         const inicioFerias = new Date(periodoAquisitivoFim);
-        inicioFerias.setDate(inicioFerias.getDate() + 1); // Início das férias: dia seguinte ao término do período aquisitivo
+        inicioFerias.setDate(inicioFerias.getDate() + 1); // Início das férias: um dia após o término do período aquisitivo
 
         const fimFerias = new Date(inicioFerias);
-        fimFerias.setDate(fimFerias.getDate() + 29); // 30 dias de férias
+        fimFerias.setDate(fimFerias.getDate() + 29); // Férias duram 30 dias (o dia inicial conta, então adicionamos 29 dias)
 
         // Gera o texto do memorando
         const memorando = `Memorando N° ${(index + 1).toString().padStart(3, '0')}/${ex.inicio.split('/')[2]}-CPS/SEDUC
