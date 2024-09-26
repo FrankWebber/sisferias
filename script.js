@@ -1,3 +1,23 @@
+function copiarTexto() {
+    // Obtenha o conteúdo da div "textoOutput"
+    const texto = document.getElementById("textoOutput").innerText;
+    
+    // Verifique se há conteúdo na div
+    if (texto.trim() !== "") {
+        // Copie o conteúdo para a área de transferência
+        navigator.clipboard.writeText(texto).then(() => {
+            alert("Texto copiado para a área de transferência!");
+        }).catch(err => {
+            console.error("Erro ao copiar texto: ", err);
+        });
+    } else {
+        alert("Nenhum texto para copiar!");
+    }
+}
+
+
+
+
 function getCurrentDate() {
     return new Date(); // Current date
 }
@@ -186,11 +206,11 @@ CIENTE EM: ____/____/________
 
 SERVIDOR(A): ____________________________________________
 
-Obs.: ________________________________________________________
+Obs.: ___________________________________________________
 
 Atenciosamente,
 
-ANTONIA IONETE VIDINHA BARROSO
+Antonia Ionete Vidinha Barroso
 Gerente GPREV/DGP/SEDUC
 Decreto de 03/08/2023
 
@@ -361,7 +381,7 @@ Manaus, 01/08/${anoExercicio}.
 
 Assunto: Requerimento de Férias.
 
-Venho respeitosamente solicitar, conforme documento anexo, o gozo de férias referente ao ${index + 1}º ano de serviço, período aquisitivo de ${ex.periodoAquisitivoInicio} a ${ex.periodoAquisitivoFim}, a serem usufruídas no período de ${ex.inicio} a ${ex.termino}.
+Venho respeitosamente solicitar, conforme documento anexo, o usufruto de férias referente ao ${index + 1}º ano de serviço, período aquisitivo de ${ex.periodoAquisitivoInicio} a ${ex.periodoAquisitivoFim}, a serem usufruídas no período de ${ex.inicio} a ${ex.termino}.
 
 Atenciosamente,
 ${servidorNome}
