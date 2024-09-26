@@ -395,3 +395,77 @@ Matrícula: ${matricula}
 
     document.getElementById('todosMemorandos').innerText = memorandos;
 }
+
+
+function salvarFeriasConcedidas() {
+    const servidorNome = document.getElementById("servidorNome").value;
+    const cargo = document.getElementById("cargo").value;
+    const matricula = document.getElementById("matricula").value;
+    const lotacao = document.getElementById("lotacao").value;
+    const dataPosse = document.getElementById("dataPosse").value;
+    const diasFerias = document.getElementById("diasFerias").value;
+    const exercicio = document.getElementById("exercicio").value;
+    const inicioFerias = document.getElementById("inicioFerias").value;
+    const fimFerias = document.getElementById("fimFerias").value;
+
+    // Criando um objeto para armazenar os dados
+    const ferias = {
+        servidorNome,
+        cargo,
+        matricula,
+        lotacao,
+        dataPosse,
+        diasFerias,
+        exercicio,
+        inicioFerias,
+        fimFerias
+    };
+
+    // Obtendo o histórico atual do LocalStorage
+    let historicoFerias = JSON.parse(localStorage.getItem('historicoFerias')) || [];
+
+    // Adicionando a nova entrada ao histórico
+    historicoFerias.push(ferias);
+
+    // Salvando novamente no LocalStorage
+    localStorage.setItem('historicoFerias', JSON.stringify(historicoFerias));
+
+    alert('Férias concedidas salvas no histórico!');
+}
+
+
+function exibirHistoricoFerias() {
+    // Obtendo o histórico do LocalStorage
+    let historicoFerias = JSON.parse(localStorage.getItem('historicoFerias')) || [];
+
+    const tabela = document.getElementById('historicoFeriasTabela');
+
+    // Limpando a tabela antes de preencher
+    tabela.innerHTML = `
+        <tr>
+            <th>Servidor</th>
+            <th>Cargo</th>
+            <th>Matrícula</th>
+            <th>Lotação</th>
+            <th>Exercício</th>
+            <th>Início das Férias</th>
+            <th>Fim das Férias</th>
+        </tr>
+    `;
+
+    // Preenchendo a tabela com os dados
+    historicoFerias.forEach(ferias => {
+        const row = `
+            <tr>
+                <td>${ferias.servidorNome}</td>
+                <td>${ferias.cargo}</td>
+                <td>${ferias.matricula}</td>
+                <td>${ferias.lotacao}</td>
+                <td>${ferias.exercicio}</td>
+                <td>${ferias.inicioFerias}</td>
+                <td>${ferias.fimFerias}</td>
+            </tr>
+        `;
+        tabela.innerHTML += row;
+    });
+}
