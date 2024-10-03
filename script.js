@@ -172,25 +172,16 @@ function gerarTexto() {
     const cargo = document.getElementById('cargo').value.trim();
     const matricula = document.getElementById('matricula').value.trim();
     const lotacao = document.getElementById('lotacao').value.trim();
-    const ingresso = document.getElementById('ingresso').value.trim();
     const diasFerias = document.getElementById('diasFerias').value.trim();
-    const exercicio = document.getElementById('exercicio').value.trim();
+    const exercicio = document.getElementById('exercicio').value.trim(); // Ex: "2024/2025"
     const inicioFerias = document.getElementById('inicioFerias').value.trim();
-    const dataPosse = document.getElementById('dataPosse').value.trim();
+    const fimFerias = document.getElementById('fimFerias').value.trim();
 
-    if (!servidorNome || !cargo || !matricula || !lotacao || !ingresso || !diasFerias || !exercicio || !inicioFerias || !dataPosse) {
+    // Validação dos campos obrigatórios
+    if (!servidorNome || !cargo || !matricula || !lotacao || !diasFerias || !exercicio || !inicioFerias || !fimFerias) {
         alert("Por favor, preencha todos os campos.");
         return;
     }
-
-    const diasFeriasNum = parseInt(diasFerias, 10);
-    if (isNaN(diasFeriasNum) || diasFeriasNum <= 0 || diasFeriasNum > 30) {
-        alert("Por favor, insira um número válido de dias de férias (1-30).");
-        return;
-    }
-
-    const fimFerias = calcularDataFinal(inicioFerias, diasFerias);
-    document.getElementById('fimFerias').value = fimFerias;
 
     const assistenteSelect = document.getElementById('assistente');
     const assistenteInfo = assistenteSelect.value.split('|');
@@ -198,26 +189,50 @@ function gerarTexto() {
     const assistenteCargo = assistenteInfo[1];
     const assistenteMatricula = assistenteInfo[2];
 
-    const texto = `Senhor Diretor,
+    // Obtém a data atual formatada
+    const dataAtual = formatDate(new Date());
 
-Pelo presente, comunicamos que de acordo com o Artigo 62 da Lei nº 1.762 de 14 de novembro de 1986, ser-lhe-ão concedidos ao(à) servidor(a) ${servidorNome}, cargo ${cargo}, matrícula ${matricula}, lotado(a) ${lotacao}, ingresso ${ingresso}, ${diasFerias} (${diasFeriasPorExtenso(diasFerias)}) dias de férias, referente ao exercício ${exercicio} (${exercicioFormatado(exercicio, dataPosse)}) as quais deverão ser gozadas no período de ${inicioFerias} a ${fimFerias}.
+    // Extrair apenas o ano inicial do exercício
+    const anoExercicio = exercicio.split('/')[0];
+
+    // Gerar o número do memorando com ano atual
+    const anoAtual = new Date().getFullYear();
+    const numeroMemorando = `1973/${anoAtual}`;
+
+    // Gerar o texto no formato solicitado, removendo "ingresso"
+    const texto = `
+MEMORANDO Nº ${numeroMemorando}-GPREV/SEDUC
+
+Manaus, ${dataAtual}.
+
+Ao Sr. chefe do Núcleo de Inteligência em Gestão/NIG
+
+Assunto: FÉRIAS ${servidorNome} - ${anoExercicio}.
+
+Senhor Diretor,
+
+Pelo presente, comunicamos que de acordo com o Artigo 62 da Lei nº 1.762 de 14 de novembro de 1986, ser-lhe-ão concedidos ao(à) servidor(a) ${servidorNome}, cargo ${cargo}, matrícula ${matricula}, lotado(a) ${lotacao}, ${diasFerias} (${diasFeriasPorExtenso(diasFerias)}) dias de férias, referente ao exercício ${anoExercicio} (25/01/${anoExercicio} a 24/01/${parseInt(anoExercicio) + 1}), as quais deverão ser gozadas no período de ${inicioFerias} a ${fimFerias}.
 
 CIENTE EM: ____/____/________
 
 SERVIDOR(A): ____________________________________________
 
-Obs.: ___________________________________________________
+Obs.: __________________________________________________
 
 Atenciosamente,
 
+________________________________
 Antonia Ionete Vidinha Barroso
 Gerente GPREV/DGP/SEDUC
 Decreto de 03/08/2023
 
+________________________________
 ${assistenteNome}
 ${assistenteCargo}
-Matrícula ${assistenteMatricula}`;
+Matrícula ${assistenteMatricula}
+`;
 
+    // Exibir o texto gerado na área de output
     document.getElementById('textoOutput').innerText = texto;
 }
 
